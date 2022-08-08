@@ -14,9 +14,10 @@ export const HistoryContainer = styled.main`
 `
 
 export const HistoryList = styled.div`
-  flex: 1;
+  //flex: 1;
   overflow: auto;
   margin-top: 2rem;
+  height: calc(100vh - 26rem);
 
   table {
     width: 100%;
@@ -24,6 +25,8 @@ export const HistoryList = styled.div`
     min-width: 600px;
 
     th {
+      position: sticky;
+      top: 0;
       background-color: ${props => props.theme['gray-600']};
       padding: 1rem;
       text-align: left;
