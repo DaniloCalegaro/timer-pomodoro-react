@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from 'react'
-import { CountdownContainer, Separator } from './styles'
 import { differenceInSeconds } from 'date-fns'
+import { useContext, useEffect } from 'react'
 import { CyclesContext } from '../../../../contexts/CyclesContext'
+import { CountdownContainer, Separator } from './styles'
 
 export function CountDown() {
   const {
@@ -14,6 +14,38 @@ export function CountDown() {
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
 
+  useEffect(() => {
+    let interval: number
+
+    if (activeCycle) {
+      interval = setInterval(() => {
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          new Date(activeCycle.startDate)
+        )
+
+        if (secondsDifference >= totalSeconds) {
+          markCurrentCycleAsFinished()
+
+          setSecondsPassed(totalSeconds)
+          clearInterval(interval)
+        } else {
+          setSecondsPassed(secondsDifference)
+        }
+      }, 1000)
+    }
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [
+    activeCycle,
+    totalSeconds,
+    activeCycleId,
+    setSecondsPassed,
+    markCurrentCycleAsFinished
+  ])
+
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
   const minutesAmount = Math.floor(currentSeconds / 60)
@@ -24,36 +56,9 @@ export function CountDown() {
 
   useEffect(() => {
     if (activeCycle) {
-      document.title = `${minutes}: ${seconds}`
+      document.title = `${minutes}:${seconds}`
     }
   }, [minutes, seconds, activeCycle])
-
-  useEffect(() => {
-    let interval: number
-
-    if (activeCycle) {
-      interval = setInterval(() => {
-        const secondsDiference = differenceInSeconds(
-          new Date(),
-          new Date(activeCycle.startDate)
-        )
-
-        if (secondsDiference > totalSeconds) {
-          markCurrentCycleAsFinished()
-          setSecondsPassed(totalSeconds)
-          clearInterval(interval)
-        } else {
-          setSecondsPassed(secondsDiference)
-        }
-      }, 1000)
-    }
-  }, [
-    activeCycle,
-    totalSeconds,
-    activeCycleId,
-    markCurrentCycleAsFinished,
-    setSecondsPassed
-  ])
 
   return (
     <CountdownContainer>
